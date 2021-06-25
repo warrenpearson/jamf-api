@@ -13,7 +13,7 @@ class JamfInventory:
 
         auth_token = self._get_auth_token(base_url, username, password)
         inventory = self._get_inventory_details(base_url, auth_token)
-        return inventory  # ["totalCount"]
+        return inventory["results"][-1]  # ["totalCount"]
 
     def _get_auth_token(self, base_url, username, password):
         auth_url = base_url + "/uapi/auth/tokens"
@@ -32,13 +32,28 @@ class JamfInventory:
         return encoded_string.decode("utf-8")
 
     def _get_inventory_details(self, base_url, auth_token):
-        inv_url = base_url + "/uapi/v1/computers-inventory"
+        inv_url = base_url + "/uapi/v1/computers-inventory?"
+
+        sections = [
+            "GENERAL",
+            "DISK_ENCRYPTION",
+            "HARDWARE",
+            "LOCAL_USER_ACCOUNTS",
+            "OPERATING_SYSTEM",
+            "SOFTWARE_UPDATES",
+        ]
+        query_string = ""
+        for section in sections:
+            query_string += f"section={section}&"
+        inv_url += query_string
+        # print(inv_url)
         response = requests.get(
             inv_url, headers={"Authorization": f"Bearer {auth_token}"}
         )
+        # print(response.text)
         return json.loads(response.text)
 
 
 if __name__ == "__main__":
     inv = JamfInventory().get_inventory()
-    print(inv)
+    print(json.dumps(inv))
