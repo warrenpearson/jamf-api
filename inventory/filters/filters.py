@@ -17,6 +17,7 @@ class StrictFilter(BaseFilter):
 
         for result in inventory["results"]:
             filtered_result = {}
+
             for item in items_of_interest.keys():
                 if items_of_interest[item] is not None:
                     section = result[item]
@@ -43,11 +44,7 @@ class LooseFilter(BaseFilter):
         details = []
 
         for result in inventory["results"]:
-            filtered_result = {}
-            for item in items_of_interest:
-                filtered_section = self._get_items_of_interest(result, [item])
-                filtered_result[item] = filtered_section
-
+            filtered_result = self._get_items_of_interest(result, items_of_interest)
             details.append(filtered_result)
 
         return details

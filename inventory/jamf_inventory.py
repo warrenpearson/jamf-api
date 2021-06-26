@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 from base64 import b64encode
+import importlib
 
 import requests
 
@@ -74,11 +76,21 @@ class JamfInventory:
 
     def report_details(self, inventory: dict):
         if self._filter_type:
-            print("TODO: filtering not enabled yet")
+            filt = self._get_filter()
+            inventory = filt.filter(inventory)
 
         return json.dumps(inventory)
 
+    def _get_filter(self):
+        module = importlib.import_module("filters.filters")
+        FilterClass = getattr(module, self._filter_type)
+        return FilterClass()
+
 
 if __name__ == "__main__":
-    inv = JamfInventory().get_inventory()
+    filter_name = None
+    if len(sys.argv) > 1:
+        filter_name = sys.argv[1]
+
+    inv = JamfInventory(filter_name).get_inventory()
     print(inv)
