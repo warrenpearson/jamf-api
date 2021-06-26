@@ -13,6 +13,9 @@ class JamfInventory:
     password you would use to login to your Jamf Pro instance via a browser.
 
     When run from the command line, the script returns JSON for easy parsing by jq.
+
+    Optionally, a filter can be applied to the output to remove known null values
+    and attributes which are not of interest.
     """
 
     def __init__(self, filter_type=None):
